@@ -1055,7 +1055,7 @@ body.iframe-open #event-modal .modal-content {
 }
 
 /* Responsive adjustments for iframe modal */
-@media (max-width: 1024px) {
+@media (max-width: 1600px) {
     .iframe-modal-content {
         left: 50%;
         transform: translate(-50%, -50%);
@@ -1065,6 +1065,12 @@ body.iframe-open #event-modal .modal-content {
     
     body.iframe-open #event-modal .modal-content {
         transform: translateX(0);
+    }
+    
+    body.iframe-open #event-modal {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
     }
 }
 
