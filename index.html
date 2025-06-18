@@ -1,0 +1,217 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimalist Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "petite-vue": "https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.es.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="app" v-scope>
+        <div id="calendar-container">
+            <div id="calendar-header">
+                <button @click="changeMonth(-1)" class="nav-btn" aria-label="Previous Month">&lt;</button>
+                <h2 id="month-year-display">{{ monthYear }}</h2>
+                <button @click="changeMonth(1)" class="nav-btn" aria-label="Next Month">&gt;</button>
+            </div>
+            <div id="calendar-weekdays">
+                <div v-for="day in weekdays" class="weekday">{{ day }}</div>
+            </div>
+            <div id="calendar-grid">
+                 <div 
+                    v-for="day in calendarDays" 
+                    :class="['day-cell', { 'not-current-month': !day.isCurrentMonth, 'today': day.isToday }]"
+                 >
+                    <div class="day-number">{{ day.day }}</div>
+                    <button class="add-task-btn" @click="openModal(day.date)" aria-label="Add task">&plus;</button>
+                    <div class="events-container">
+                        <div v-for="(event, index) in getEventsForDate(day.date)" class="event-block" :title="event.title + (event.description ? ' - ' + event.description : '')" @click.stop="viewEvent(day.date, index)">
+                            <div class="event-title">
+                                <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator">🔄</span>
+                                <span v-if="event.link" class="link-indicator">🔗</span>
+                                {{ event.title }}
+                            </div>
+                            <div v-if="event.description" class="event-description">{{ event.description }}</div>
+                            <div v-if="event.time" class="event-time">{{ formatTime(event.time) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Button and Popup -->
+        <button id="summary-btn" @click="toggleSummary" class="summary-button" aria-label="View upcoming events">
+            <span class="material-symbols-light--date-range-outline"></span>
+        </button>
+
+        <div id="summary-popup" v-if="summaryOpen" class="summary-popup">
+            <div class="summary-header">
+                <h3>Upcoming Events</h3>
+                <button @click="toggleSummary" class="close-summary-btn">&times;</button>
+            </div>
+            <div class="summary-content">
+                <div v-if="upcomingEvents.length === 0" class="no-events">
+                    No upcoming events
+                </div>
+                <div v-for="event in upcomingEvents" class="summary-event">
+                    <div class="summary-event-date">{{ formatSummaryDate(event.date) }}</div>
+                    <div class="summary-event-title">
+                        <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator">🔄</span>
+                        <span v-if="event.link" class="link-indicator">🔗</span>
+                        {{ event.title }}
+                    </div>
+                    <div v-if="event.time" class="summary-event-time">{{ formatTime(event.time) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="event-modal" v-if="modal.isOpen">
+            <div class="modal-content">
+                <h3 id="modal-title">{{ modal.isViewing ? 'View Event' : (modal.isEditing ? 'Edit Event' : 'Add Event') }}</h3>
+                <p id="modal-date-display">{{ new Date(modal.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
+                
+                <div v-if="modal.isViewing" class="view-mode">
+                    <div class="view-group">
+                        <label>Event Title</label>
+                        <div class="view-value">{{ modal.title }}</div>
+                    </div>
+                    
+                    <div class="view-group" v-if="modal.description">
+                        <label>Description</label>
+                        <div class="view-value">{{ modal.description }}</div>
+                    </div>
+                    
+                    <div class="view-group" v-if="modal.time">
+                        <label>Due Date & Time</label>
+                        <div class="view-value">{{ formatTime(modal.time) }}</div>
+                    </div>
+
+                    <div class="view-group" v-if="modal.link">
+                        <label>Link</label>
+                        <div class="view-value">
+                            <a :href="modal.link" target="_blank" rel="noopener noreferrer" class="event-link">{{ modal.link }}</a>
+                        </div>
+                    </div>
+
+                    <div class="view-group" v-if="modal.recurring && modal.recurring.enabled">
+                        <label>Recurring</label>
+                        <div class="view-value recurring-info">
+                            <span class="recurring-badge">🔄</span>
+                            {{ getRecurringText(modal.recurring) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="modal-form">
+                    <div class="input-group">
+                        <label for="event-title-input">Event Title</label>
+                        <input type="text" v-model="modal.title" id="event-title-input" placeholder="Enter event title" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="event-description-input">Description (optional)</label>
+                        <textarea v-model="modal.description" id="event-description-input" placeholder="Add description"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="event-time-input">Due Date & Time (optional)</label>
+                        <input type="datetime-local" v-model="modal.time" id="event-time-input">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="event-link-input">Link (optional)</label>
+                        <input type="url" v-model="modal.link" id="event-link-input" placeholder="https://example.com">
+                    </div>
+
+                    <div v-if="modal.link" class="input-group">
+                        <label>Open link in</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" v-model="modal.linkTarget" value="new-window" name="link-target">
+                                <span class="radio-checkmark"></span>
+                                New window
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" v-model="modal.linkTarget" value="popup" name="link-target">
+                                <span class="radio-checkmark"></span>
+                                Popup window
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" v-model="modal.recurring.enabled" id="recurring-checkbox">
+                            <span class="checkmark"></span>
+                            Recurring Event
+                        </label>
+                    </div>
+
+                    <div v-if="modal.recurring.enabled" class="recurring-options">
+                        <div class="input-group">
+                            <label for="recurring-type">Repeat</label>
+                            <select v-model="modal.recurring.type" id="recurring-type">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="bi-weekly">Bi-weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+
+                        <div v-if="modal.recurring.type === 'custom'" class="input-group">
+                            <label for="recurring-interval">Every</label>
+                            <div class="custom-interval">
+                                <input type="number" v-model="modal.recurring.interval" id="recurring-interval" min="1" max="999">
+                                <select v-model="modal.recurring.unit">
+                                    <option value="days">Days</option>
+                                    <option value="weeks">Weeks</option>
+                                    <option value="months">Months</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Ends</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" v-model="modal.recurring.endType" value="forever" name="end-type">
+                                    <span class="radio-checkmark"></span>
+                                    Never
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" v-model="modal.recurring.endType" value="until" name="end-type">
+                                    <span class="radio-checkmark"></span>
+                                    On date
+                                </label>
+                            </div>
+                        </div>
+
+                        <div v-if="modal.recurring.endType === 'until'" class="input-group">
+                            <label for="recurring-end-date">End Date</label>
+                            <input type="date" v-model="modal.recurring.endDate" id="recurring-end-date">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button @click="deleteEvent" v-if="modal.isEditing || modal.isViewing" id="delete-event-btn">Delete</button>
+                    <button @click="closeModal" id="cancel-event-btn">{{ modal.isViewing ? 'Close' : 'Cancel' }}</button>
+                    <button @click="saveEvent" v-if="!modal.isViewing" id="save-event-btn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
