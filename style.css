@@ -278,6 +278,10 @@ html {
     }
 }
 
+#event-modal .modal-content {
+    transition: transform 0.3s ease-out;
+}
+
 .modal-content {
     background-color: var(--bg-color);
     padding: 1rem;
@@ -368,11 +372,12 @@ textarea {
     justify-content: flex-end;
     gap: 0.75rem;
     margin-top: 0.5rem;
+    position: relative;
 }
 
 .modal-buttons button {
     padding: 0.5rem 1rem;
-    border-radius: 4px;
+    border-radius: 8px;
     border: 1px solid var(--lines-color);
     cursor: pointer;
     font-weight: 500;
@@ -388,32 +393,97 @@ textarea {
 }
 
 #save-event-btn {
-    background-color: #2a2a2a;
-    border-color: #444;
+    background-color: #ff4a008a;
+    border-color: #333;
 }
 
 #save-event-btn:hover {
-    background-color: #333;
-    border-color: #555;
+    background-color: #ff4a00;
+    border-color: #333;
 }
 
 #delete-event-btn {
-    background-color: #2a2a2a;
-    border-color: #444;
-    margin-right: auto;
+    border: 1px solid #ff0000;
+    background-image: repeating-linear-gradient(45deg, #ff00008a, #ff00008a 2px, #ff00004d 2px, #ff00004d 14px);
+    margin-left: auto;
 }
 
 #delete-event-btn:hover {
     background-color: #333;
-    border-color: #555;
+    border-color: #ff3333;
 }
 
 #cancel-event-btn {
-    background-color: #444;
+    background-color: #111;
     color: var(--text-color);
 }
 #cancel-event-btn:hover {
-    background-color: #555;
+    background-color: #333;
+}
+
+/* Delete Confirmation Popup */
+.delete-confirmation-popup {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 0.5rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--lines-color);
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    animation: deletePopupSlideIn 0.2s ease-out;
+    min-width: 200px;
+}
+
+@keyframes deletePopupSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.delete-confirmation-content p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.delete-confirmation-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.cancel-delete-btn, .confirm-delete-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    background-color: var(--block-color);
+    color: var(--text-color);
+}
+
+.cancel-delete-btn:hover {
+    background-color: #222;
+    border-color: #555;
+}
+
+.confirm-delete-btn {
+    border: 1px solid #ff0000 !important;
+    background-image: repeating-linear-gradient(45deg, #ff00008a, #ff00008a 2px, #ff00004d 2px, #ff00004d 14px);
+    color: white;
+}
+
+.confirm-delete-btn:hover {
+    background-color: #333;
+    border-color: #ff3333;
 }
 
 .view-mode {
@@ -431,17 +501,15 @@ textarea {
 .view-group label {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #ccc;
+    color: #f1f1f1;
 }
 
 .view-value {
     padding: 0.75rem 0;
     background-color: transparent;
     border: none;
-    border-left: 3px solid var(--lines-color);
-    padding-left: 0.75rem;
     font-size: 0.95rem;
-    color: var(--text-color);
+    color: #ccc;
     line-height: 1.4;
 }
 
@@ -683,6 +751,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-right: 0.25rem;
 }
 
+.link-target-indicator {
+    font-size: 0.75rem;
+    color: #888;
+    margin-left: 0.5rem;
+    font-style: italic;
+    opacity: 0.8;
+}
+
 /* Summary Button and Popup */
 .summary-button {
     position: fixed;
@@ -715,7 +791,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: inline-block;
     width: 24px;
     height: 24px;
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M8 13.885q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23m4 0q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23m4 0q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23M5.616 21q-.691 0-1.153-.462T4 19.385V6.615q0-.69-.462 1.153T5.616 5h1.769V2.77h1.077V5h7.154V2.77h1V5h1.769q.69 0 1.153.463T20 6.616v12.769q0 .69-.462 1.153T18.384 21zm0-1h12.769q.23 0 .423-.192t.192-.424v-8.768H5v8.769q0 .23-.192.423T5.616 21zm0 0V6z'/%3E%3C/svg%3E");
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M8 13.885q-.31 0-.54-.23t-.23-.54t.23-.539t.54-.23t.54.23t.23.54t-.23.539t-.54.23M5.616 21q-.691 0-1.153-.462T4 19.385V6.615q0-.69-.462 1.153T5.616 5h1.769V2.77h1.077V5h7.154V2.77h1V5h1.769q.69 0 1.153.463T20 6.616v12.769q0 .69-.462 1.153T18.384 21zm0-1h12.769q.23 0 .423-.192t.192-.424v-8.768H5v8.769q0 .23-.192.423T5.616 21zm0 0V6z'/%3E%3C/svg%3E");
     background-color: currentColor;
     -webkit-mask-image: var(--svg);
     mask-image: var(--svg);
@@ -836,6 +912,162 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #999;
 }
 
+/* Crumb Indicator */
+.crumb-indicator {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 5rem;
+    background-color: var(--bg-color);
+    border: 1px solid var(--lines-color);
+    border-radius: 8px;
+    padding: 0.75rem;
+    max-width: 250px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 998;
+    animation: crumbSlideIn 0.3s ease-out;
+}
+
+@keyframes crumbSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+.crumb-close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    opacity: 0.6;
+}
+
+.crumb-close-btn:hover {
+    opacity: 1;
+}
+
+.crumb-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 2rem;
+}
+
+.crumb-text {
+    font-size: 12px;
+    color: #b5b5b5;
+    line-height: 1.3;
+}
+
+/* Iframe Modal */
+.iframe-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+    pointer-events: none;
+}
+
+.iframe-modal-content {
+    position: absolute;
+    left: calc(50% - 200px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1400px;
+    height: 80vh;
+    background-color: var(--bg-color);
+    border: 1px solid var(--lines-color);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: iframeSlideIn 0.2s ease-out;
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease-out;
+}
+
+@keyframes iframeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0) scale(1);
+    }
+}
+
+.iframe-close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--bg-color);
+    border: 1px solid var(--lines-color);
+    color: var(--text-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    z-index: 1002;
+}
+
+.iframe-close-btn:hover {
+    background-color: #222;
+}
+
+.iframe-content {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Modal positioning adjustments when iframe is open */
+body.iframe-open #event-modal .modal-content {
+    transform: translateX(-450px);
+    transition: transform 0.3s ease-out;
+}
+
+/* Responsive adjustments for iframe modal */
+@media (max-width: 1024px) {
+    .iframe-modal-content {
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 95%;
+        max-width: none;
+    }
+    
+    body.iframe-open #event-modal .modal-content {
+        transform: translateX(0);
+    }
+}
+
 /* Responsive adjustments for summary */
 @media (max-width: 768px) {
     .summary-popup {
@@ -843,6 +1075,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         left: 1rem;
         width: auto;
         bottom: 5rem;
+    }
+    
+    .summary-button {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
+/* Responsive adjustments for crumb */
+@media (max-width: 768px) {
+    .crumb-indicator {
+        right: 1rem;
+        bottom: 5rem;
+        left: 1rem;
+        max-width: none;
     }
     
     .summary-button {

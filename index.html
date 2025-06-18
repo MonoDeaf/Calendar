@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -54,6 +53,14 @@
             <span class="material-symbols-light--date-range-outline"></span>
         </button>
 
+        <!-- Crumb Indicator -->
+        <div id="crumb-indicator" v-if="crumbVisible" class="crumb-indicator">
+            <button @click="closeCrumb" class="crumb-close-btn">&times;</button>
+            <div class="crumb-content">
+                <span class="crumb-text">Events and tasks are saved locally on this device</span>
+            </div>
+        </div>
+
         <div id="summary-popup" v-if="summaryOpen" class="summary-popup">
             <div class="summary-header">
                 <h3>Upcoming Events</h3>
@@ -99,7 +106,8 @@
                     <div class="view-group" v-if="modal.link">
                         <label>Link</label>
                         <div class="view-value">
-                            <a :href="modal.link" target="_blank" rel="noopener noreferrer" class="event-link">{{ modal.link }}</a>
+                            <a @click.prevent="openEventLink({ link: modal.link, linkTarget: modal.linkTarget })" href="#" class="event-link">{{ modal.link }}</a>
+                            <span class="link-target-indicator">{{ getLinkTargetText(modal.linkTarget) }}</span>
                         </div>
                     </div>
 
@@ -144,7 +152,12 @@
                             <label class="radio-label">
                                 <input type="radio" v-model="modal.linkTarget" value="popup" name="link-target">
                                 <span class="radio-checkmark"></span>
-                                Popup window
+                                Popup
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" v-model="modal.linkTarget" value="iframe" name="link-target">
+                                <span class="radio-checkmark"></span>
+                                Iframe
                             </label>
                         </div>
                     </div>
@@ -205,10 +218,27 @@
                 </div>
                 
                 <div class="modal-buttons">
-                    <button @click="deleteEvent" v-if="modal.isEditing || modal.isViewing" id="delete-event-btn">Delete</button>
                     <button @click="closeModal" id="cancel-event-btn">{{ modal.isViewing ? 'Close' : 'Cancel' }}</button>
+                    <div v-if="deleteConfirmation.isOpen" class="delete-confirmation-popup">
+                        <div class="delete-confirmation-content">
+                            <p>Are you sure you want to delete this event?</p>
+                            <div class="delete-confirmation-buttons">
+                                <button @click="cancelDelete" class="cancel-delete-btn">Cancel</button>
+                                <button @click="confirmDelete" class="confirm-delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button @click="deleteEvent" v-if="modal.isEditing || modal.isViewing" id="delete-event-btn">Delete</button>
                     <button @click="saveEvent" v-if="!modal.isViewing" id="save-event-btn">Save</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Iframe Modal -->
+        <div id="iframe-modal" v-if="iframeModal.isOpen" class="iframe-modal">
+            <div class="iframe-modal-content">
+                <button @click="closeIframeModal" class="iframe-close-btn">&times;</button>
+                <iframe :src="iframeModal.url" class="iframe-content" frameborder="0"></iframe>
             </div>
         </div>
     </div>

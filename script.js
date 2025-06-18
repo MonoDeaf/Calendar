@@ -28,7 +28,19 @@ createApp({
       endDate: ''
     }
   },
+  deleteConfirmation: {
+    isOpen: false
+  },
   summaryOpen: false,
+  iframeModal: {
+    isOpen: false,
+    url: ''
+  },
+  crumbVisible: (() => {
+    // Reset the localStorage to make crumb appear again
+    localStorage.removeItem('crumb-dismissed');
+    return true;
+  })(),
 
   get monthYear() {
     return this.currentDate.toLocaleDateString(undefined, {
@@ -297,61 +309,86 @@ createApp({
   },
 
   deleteEvent() {
-    if (confirm('Are you sure you want to delete this event?')) {
-        if (this.modal.isViewing && this.modal.eventIndex !== null) {
-            const eventToDelete = this.events[this.modal.date][this.modal.eventIndex];
+    this.deleteConfirmation.isOpen = true;
+  },
+
+  confirmDelete() {
+    if (this.modal.isViewing && this.modal.eventIndex !== null) {
+      const eventToDelete = this.events[this.modal.date][this.modal.eventIndex];
+      
+      // Check if this is a recurring event
+      if (eventToDelete.recurring && eventToDelete.recurring.enabled) {
+        // Delete all future recurring instances
+        const currentDate = new Date(this.modal.date + 'T00:00:00');
+        
+        // Iterate through all dates and remove matching recurring events
+        Object.keys(this.events).forEach(dateStr => {
+          const eventDate = new Date(dateStr + 'T00:00:00');
+          
+          // Only delete events on or after the current date
+          if (eventDate >= currentDate) {
+            this.events[dateStr] = this.events[dateStr].filter(event => {
+              // Keep events that don't match the recurring event pattern
+              return !(event.recurring && 
+                     event.recurring.enabled &&
+                     event.title === eventToDelete.title &&
+                     event.description === eventToDelete.description &&
+                     JSON.stringify(event.recurring) === JSON.stringify(eventToDelete.recurring));
+            });
             
-            // Check if this is a recurring event
-            if (eventToDelete.recurring && eventToDelete.recurring.enabled) {
-                // Delete all future recurring instances
-                const currentDate = new Date(this.modal.date + 'T00:00:00');
-                
-                // Iterate through all dates and remove matching recurring events
-                Object.keys(this.events).forEach(dateStr => {
-                    const eventDate = new Date(dateStr + 'T00:00:00');
-                    
-                    // Only delete events on or after the current date
-                    if (eventDate >= currentDate) {
-                        this.events[dateStr] = this.events[dateStr].filter(event => {
-                            // Keep events that don't match the recurring event pattern
-                            return !(event.recurring && 
-                                   event.recurring.enabled &&
-                                   event.title === eventToDelete.title &&
-                                   event.description === eventToDelete.description &&
-                                   JSON.stringify(event.recurring) === JSON.stringify(eventToDelete.recurring));
-                        });
-                        
-                        // Clean up empty date arrays
-                        if (this.events[dateStr].length === 0) {
-                            delete this.events[dateStr];
-                        }
-                    }
-                });
-            } else {
-                // Non-recurring event - delete only this instance
-                this.events[this.modal.date].splice(this.modal.eventIndex, 1);
-                // Clean up empty date arrays
-                if (this.events[this.modal.date].length === 0) {
-                    delete this.events[this.modal.date];
-                }
+            // Clean up empty date arrays
+            if (this.events[dateStr].length === 0) {
+              delete this.events[dateStr];
             }
-        } else {
-            // Legacy behavior for editing mode
-            delete this.events[this.modal.date];
+          }
+        });
+      } else {
+        // Non-recurring event - delete only this instance
+        this.events[this.modal.date].splice(this.modal.eventIndex, 1);
+        // Clean up empty date arrays
+        if (this.events[this.modal.date].length === 0) {
+          delete this.events[this.modal.date];
         }
-        this.saveEvents();
-        this.closeModal();
+      }
+    } else {
+      // Legacy behavior for editing mode
+      delete this.events[this.modal.date];
     }
+    this.saveEvents();
+    this.deleteConfirmation.isOpen = false;
+    this.closeModal();
+  },
+
+  cancelDelete() {
+    this.deleteConfirmation.isOpen = false;
   },
 
   openEventLink(event) {
     if (event.link) {
-      if (event.linkTarget === 'popup') {
-        window.open(event.link, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+      if (event.linkTarget === 'iframe') {
+        this.iframeModal.url = event.link;
+        this.iframeModal.isOpen = true;
+        // Add class to body to trigger repositioning animation
+        document.body.classList.add('iframe-open');
+      } else if (event.linkTarget === 'popup') {
+        // Calculate center position
+        const popupWidth = 1200;
+        const popupHeight = 720;
+        const left = (screen.width - popupWidth) / 2;
+        const top = (screen.height - popupHeight) / 2;
+        const popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,location=no,directories=no,status=no,menubar=no`;
+        window.open(event.link, '_blank', popupFeatures);
       } else {
         window.open(event.link, '_blank', 'noopener,noreferrer');
       }
     }
+  },
+
+  closeIframeModal() {
+    this.iframeModal.isOpen = false;
+    this.iframeModal.url = '';
+    // Remove class from body to reset positioning
+    document.body.classList.remove('iframe-open');
   },
 
   getEventsForDate(dateStr) {
@@ -379,6 +416,20 @@ createApp({
             month: 'short', 
             day: 'numeric' 
         });
+    }
+  },
+
+  closeCrumb() {
+    this.crumbVisible = false;
+    localStorage.setItem('crumb-dismissed', 'true');
+  },
+
+  getLinkTargetText(linkTarget) {
+    switch (linkTarget) {
+      case 'new-window': return '(New window)';
+      case 'popup': return '(Popup)';
+      case 'iframe': return '(Iframe)';
+      default: return '(New window)';
     }
   }
 
