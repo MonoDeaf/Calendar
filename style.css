@@ -993,7 +993,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     left: calc(50% - 200px);
     top: 50%;
     transform: translateY(-50%);
-    width: 1400px;
+    width: min(90vw, 55vw);
     height: 80vh;
     background-color: var(--bg-color);
     border: 1px solid var(--lines-color);
@@ -1059,7 +1059,7 @@ body.iframe-open #event-modal .modal-content {
     .iframe-modal-content {
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 95%;
+        width: min(95vw, 90vw);
         max-width: none;
     }
     
