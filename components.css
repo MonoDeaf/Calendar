@@ -1,0 +1,254 @@
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ccc;
+}
+
+input[type="text"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="url"],
+input[type="date"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.6rem;
+    background-color: var(--block-color);
+    border: 1px solid var(--lines-color);
+    color: var(--text-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #555;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+textarea {
+    min-height: 80px;
+    resize: none;
+    font-family: inherit;
+}
+
+/* --- Modern Controls Start --- */
+.checkbox-label, .radio-label {
+    position: relative;
+    padding-left: 28px; /* Space for custom control */
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox and radio button */
+.checkbox-label input, .radio-label input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Create a custom checkmark/indicator */
+.checkmark, .radio-checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 18px;
+    width: 18px;
+    background-color: var(--block-color);
+    border: 1px solid var(--lines-color);
+    transition: all 0.2s ease;
+}
+
+/* Custom Checkbox */
+.checkmark {
+    border-radius: 4px;
+}
+
+/* When the checkbox is checked, add a background color */
+.checkbox-label input:checked ~ .checkmark {
+    background-color: #ff4a00;
+    border-color: #ff4a00;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-label input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-label .checkmark:after {
+    left: 30%;
+    top: 10%;
+    width: 4px;
+    height: 8px;
+    border: solid var(--bg-color);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Custom Radio button */
+.radio-checkmark {
+    border-radius: 50%;
+}
+
+/* When the radio button is checked, add a background color */
+.radio-label input:checked ~ .radio-checkmark {
+    border-color: #ff4a00;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.radio-checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator when checked */
+.radio-label input:checked ~ .radio-checkmark:after {
+    display: block;
+}
+
+/* Style the indicator */
+.radio-label .radio-checkmark:after {
+    top: 3px;
+    left: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff4a00;
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem !important;
+    font-weight: normal !important;
+    color: var(--text-color) !important;
+    line-height: 18px; /* Align text with custom control */
+}
+
+.radio-label input[type="radio"] {
+    width: auto !important;
+    margin: 0;
+}
+
+.recurring-options {
+    border: 1px solid var(--lines-color);
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.custom-interval {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.custom-interval input[type="number"] {
+    flex: 1;
+}
+
+.custom-interval select {
+    flex: 2;
+}
+
+.recurring-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.recurring-badge {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.event-link {
+    color: #ff4a00;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.event-link:hover {
+    text-decoration: underline;
+}
+
+.link-target-indicator {
+    font-size: 0.75rem;
+    color: #888;
+    margin-left: 0.5rem;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.material-symbols-light--check-box {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m10.95 11.887l-1.071-1.072q-.146-.14-.354-.14t-.354.146t-.146.354t.146.354l1.189 1.194q.242.243.578.243t.577-.243l3.314-3.32q.146-.145.155-.343t-.155-.364q-.146-.146-.354-.146t-.354.146zM12 16.923l-3.738 1.608q-.808.348-1.535-.134Q6 17.916 6 17.052V5.616q0-.691.463-1.153T7.616 4h8.769q.69 0 1.153.463T18 5.616v11.436q0 .864-.727 1.345q-.727.482-1.535.134z'/%3E%3C/svg%3E");
+    background-color: currentColor;
+    -webkit-mask-image: var(--svg);
+    mask-image: var(--svg);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+.material-symbols-light--date-range-outline {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M8.116 16h10.769q.23 0 .423-.192t.192-.423V4.615q0-.23-.192-.423T18.884 4H17.5v6.116l-2-1.193l-2 1.193V4H8.116q-.231 0-.424.192t-.192.423v10.77q0 .23.192.423t.423.192m0 1q-.69 0-1.153-.462T6.5 15.385V4.615q0-.69.463-1.153T8.116 3h10.769q.69 0 1.153.462t.462 1.153v10.77q0 .69-.462 1.152T18.884 17zm-3 3q-.69 0-1.153-.462T3.5 18.385V6.615h1v11.77q0 .23.192.423t.423.192h11.77v1zM13.5 4h4zM8.116 4H7.5h12z'/%3E%3C/svg%3E");
+    background-color: currentColor;
+    -webkit-mask-image: var(--svg);
+    mask-image: var(--svg);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
