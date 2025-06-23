@@ -172,6 +172,11 @@ export const EventManager = {
     } else {
         this.events[this.modal.date].push(eventData);
         
+        // Award points for creating a new task
+        if (this.awardTaskCreation) {
+            this.awardTaskCreation();
+        }
+        
         // Generate recurring events if enabled
         if (this.modal.recurring.enabled) {
             this.generateRecurringEvents(eventData, this.modal.date);

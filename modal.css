@@ -398,8 +398,8 @@
 /* Crumb Indicator */
 .crumb-indicator {
     position: fixed;
-    bottom: 1.5rem;
-    right: 5rem;
+    bottom: 1rem;
+    left: 1rem;
     background-color: var(--bg-color);
     border: 1px solid var(--lines-color);
     border-radius: 8px;
@@ -576,7 +576,7 @@ body.iframe-open #event-modal .modal-content {
 @media (max-width: 768px) {
     .crumb-indicator {
         right: 1rem;
-        bottom: 5rem;
+        bottom: 8rem;
         left: 1rem;
         max-width: none;
     }
@@ -584,5 +584,10 @@ body.iframe-open #event-modal .modal-content {
     .summary-button {
         bottom: 1rem;
         right: 1rem;
+    }
+    
+    .points-button {
+        bottom: 1rem;
+        right: 5.5rem;
     }
 }

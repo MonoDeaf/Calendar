@@ -4,11 +4,13 @@ import confetti from 'canvas-confetti';
 import { EventManager } from './modules/event-manager.js';
 import { ModalManager } from './modules/modal-manager.js';
 import { CalendarUtils } from './modules/calendar-utils.js';
+import { PointsManager } from './modules/points-manager.js';
 
 createApp({
   ...EventManager,
   ...ModalManager,
   ...CalendarUtils,
+  ...PointsManager,
 
   // Core calendar state
   STORAGE_KEY: 'minimal-calendar-events',
@@ -129,13 +131,16 @@ createApp({
     localStorage.setItem('crumb-dismissed', 'true');
   },
 
-  // Override completeTask to include confetti
+  // Override completeTask to include confetti and points
   completeTask() {
     if (this.modal.isViewing && this.modal.eventIndex !== null) {
       // Mark only this specific event as completed
       this.events[this.modal.date][this.modal.eventIndex].completed = true;
       this.modal.completed = true;
       this.saveEvents();
+      
+      // Award points and track completion
+      this.awardTaskCompletion();
       
       // Trigger confetti celebration
       this.confetti({
@@ -147,8 +152,25 @@ createApp({
     }
   },
 
+  // Points modal methods
+  togglePoints() {
+    if (this.pointsModal.isOpen) {
+      this.closePointsModal();
+    } else {
+      this.openPointsModal();
+    }
+  },
+
   mounted() {
     this.loadEvents();
+    this.loadPointsData();
+    // Ensure points data is properly reactive by updating the component state
+    this.$nextTick(() => {
+      // Force reactivity update for points data
+      this.pointsData = { ...this.pointsData };
+      // also re-wrap dailyPoints so nested daily values stay reactive
+      this.pointsData.dailyPoints = { ...this.pointsData.dailyPoints };
+    });
   }
 
 }).mount('#app');

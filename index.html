@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -40,7 +41,7 @@
                     <div class="events-container">
                         <div v-for="(event, index) in getEventsForDate(day.date)" :class="['event-block', { 'completed': event.completed }]" :title="event.title + (event.description ? ' - ' + event.description : '')" @click.stop="viewEvent(day.date, index)">
                             <div class="event-title">
-                                <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator">🔄</span>
+                                <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator material-symbols-light--rotate-left"></span>
                                 <span v-if="event.link" class="link-indicator">🔗</span>
                                 <span v-if="event.completed" class="completed-indicator material-symbols-light--check-box">✓</span>
                                 {{ event.title }}
@@ -56,6 +57,12 @@
         <!-- Summary Button and Popup -->
         <button id="summary-btn" @click="toggleSummary" class="summary-button" aria-label="View upcoming events">
             <span class="material-symbols-light--date-range-outline"></span>
+        </button>
+
+        <!-- Points Button -->
+        <button id="points-btn" @click="togglePoints" class="points-button" aria-label="View points and progress">
+            <span class="material-symbols-light--star"></span>
+            <div v-if="pointsIndicator.visible" class="points-indicator-dot"></div>
         </button>
 
         <!-- Crumb Indicator -->
@@ -78,12 +85,116 @@
                 <div v-for="event in upcomingEvents" class="summary-event">
                     <div class="summary-event-date">{{ formatSummaryDate(event.date) }}</div>
                     <div class="summary-event-title">
-                        <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator">🔄</span>
+                        <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator material-symbols-light--rotate-left"></span>
                         <span v-if="event.link" class="link-indicator">🔗</span>
                         <span v-if="event.completed" class="completed-indicator material-symbols-light--check-box">✓</span>
                         {{ event.title }}
                     </div>
                     <div v-if="event.time" class="summary-event-time">{{ formatTime(event.time) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Points Popup -->
+        <div id="points-popup" v-if="pointsModal.isOpen" class="points-popup">
+            <div class="points-header">
+                <h3>Points & Progress</h3>
+                <button @click="closePointsModal" class="close-points-btn">&times;</button>
+            </div>
+            <div class="points-content">
+                <div class="points-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ pointsData.totalPoints }}</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ getTodayPoints() }}</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ getWeeklyPoints() }}</div>
+                        <div class="stat-label">This Week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ pointsData.streaks.current }}</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                </div>
+
+                <div class="daily-progress">
+                    <h4>Last 7 Days</h4>
+                    <div class="progress-days">
+                        <div v-for="day in getRecentDays()" :class="['progress-day', { 'today': day.isToday }]">
+                            <div class="progress-day-name">{{ day.dayName }}</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" :style="{ height: Math.max(4, (day.points / Math.max(1, Math.max(...getRecentDays().map(d => d.points)))) * 56) + 'px' }"></div>
+                            </div>
+                            <div class="progress-points">{{ day.points }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements">
+                    <h4>Achievements</h4>
+                    
+                    <!-- First Task Achievement -->
+                    <div :class="['achievement-item', { 'completed': pointsData.tasksCreated >= 1 }]">
+                        <div class="achievement-icon">🎯</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Getting Started</div>
+                            <div class="achievement-desc">Create your first task</div>
+                        </div>
+                        <div v-if="pointsData.tasksCreated >= 1" class="achievement-checkmark">✓</div>
+                    </div>
+                    
+                    <!-- Task Master Achievement -->
+                    <div :class="['achievement-item', { 'completed': pointsData.tasksCompleted >= 5 }]">
+                        <div class="achievement-icon">⭐</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Task Master</div>
+                            <div class="achievement-desc">Complete 5 tasks</div>
+                        </div>
+                        <div v-if="pointsData.tasksCompleted >= 5" class="achievement-checkmark">✓</div>
+                    </div>
+                    
+                    <!-- Task Champion Achievement -->
+                    <div :class="['achievement-item', { 'completed': pointsData.tasksCompleted >= 50 }]">
+                        <div class="achievement-icon">🏆</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Task Champion</div>
+                            <div class="achievement-desc">Complete 50 tasks</div>
+                        </div>
+                        <div v-if="pointsData.tasksCompleted >= 50" class="achievement-checkmark">✓</div>
+                    </div>
+                    
+                    <!-- Century Club Achievement -->
+                    <div :class="['achievement-item', { 'completed': pointsData.totalPoints >= 100 }]">
+                        <div class="achievement-icon">💯</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Century Club</div>
+                            <div class="achievement-desc">Earn 100 points</div>
+                        </div>
+                        <div v-if="pointsData.totalPoints >= 100" class="achievement-checkmark">✓</div>
+                    </div>
+                    
+                    <!-- Consistency King Achievement -->
+                    <div :class="['achievement-item', { 'completed': pointsData.streaks.longest >= 7 }]">
+                        <div class="achievement-icon">💎</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Consistency Is Key</div>
+                            <div class="achievement-desc">7-day streak</div>
+                        </div>
+                        <div v-if="pointsData.streaks.longest >= 7" class="achievement-checkmark">✓</div>
+                    </div>
+                    
+                    <!-- Placeholder for no achievements yet -->
+                    <div v-if="pointsData.tasksCreated === 0" class="achievement-item incomplete">
+                        <div class="achievement-icon">🎯</div>
+                        <div class="achievement-text">
+                            <div class="achievement-name">Start creating tasks to unlock achievements!</div>
+                            <div class="achievement-desc">Your journey begins here</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -124,7 +235,7 @@
                     <div class="view-group" v-if="modal.recurring && modal.recurring.enabled">
                         <label>Recurring</label>
                         <div class="view-value recurring-info">
-                            <span class="recurring-badge">🔄</span>
+                            <span class="recurring-badge material-symbols-light--rotate-left"></span>
                             {{ getRecurringText(modal.recurring) }}
                         </div>
                     </div>
