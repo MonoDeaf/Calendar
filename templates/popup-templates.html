@@ -31,12 +31,12 @@
         <!-- Notifications Toggle -->
         <div class="notification-toggle-section">
             <label class="checkbox-label notification-toggle-label">
-                <input type="checkbox" v-model="notificationSettings.enabled" @change="toggleNotifications" :disabled="notificationSettings.isChecking">
+                <input type="checkbox" v-model="notificationSettings.enabled" @change="toggleNotifications">
                 <span class="checkmark"></span>
                 Enable task notifications
             </label>
-            <div v-if="showNotificationWarning" class="notification-warning">
-                Notifications are blocked. Please enable them for this site in your browser settings.
+            <div v-if="notificationSettings.enabled && notificationSettings.permission === 'denied'" class="notification-warning">
+                Notifications are blocked. Please enable them in your browser settings.
             </div>
         </div>
 

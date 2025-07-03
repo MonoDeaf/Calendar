@@ -43,8 +43,8 @@ async function initializeApp() {
     // Notification settings
     notificationSettings: {
       enabled: false,
-      permission: 'default', // 'default', 'granted', 'denied'
-      isChecking: false // To prevent race conditions
+      permission: 'default',
+      lastCheck: null
     },
 
     // Core computed properties
@@ -131,12 +131,6 @@ async function initializeApp() {
           .slice(0, 10);
     },
 
-    // A computed property to determine if the warning should be shown
-    get showNotificationWarning() {
-      // Show warning if permission is denied, and the user is trying to enable notifications.
-      return this.notificationSettings.permission === 'denied';
-    },
-
     // Core navigation methods
     changeMonth(direction) {
       this.currentDate.setMonth(this.currentDate.getMonth() + direction);
@@ -203,43 +197,25 @@ async function initializeApp() {
 
     // Notification methods
     async toggleNotifications() {
-      // Prevent multiple requests at once
-      if (this.notificationSettings.isChecking) return;
-      this.notificationSettings.isChecking = true;
-
-      try {
-        if (this.notificationSettings.enabled) {
-          // If user is trying to enable notifications
+      if (this.notificationSettings.enabled) {
+        if (this.notificationSettings.permission !== 'granted') {
           const permission = await Notification.requestPermission();
           this.notificationSettings.permission = permission;
-
-          if (permission === 'granted') {
-            this.scheduleNotificationCheck();
-          } else {
-            // Permission denied or dismissed, uncheck the box
+          
+          if (permission !== 'granted') {
             this.notificationSettings.enabled = false;
-            this.clearNotificationCheck();
-            if (permission === 'denied') {
-               alert('Notifications were blocked. To enable them, you will need to go into your browser\'s site settings for this page.');
-            }
+            alert('Notifications need to be enabled in your browser to receive task reminders.');
+            return;
           }
-        } else {
-          // If user is disabling notifications
-          this.clearNotificationCheck();
         }
-        this.saveNotificationSettings();
-      } catch (error) {
-        console.error("Error handling notification permissions:", error);
-        // Reset state on error
-        this.notificationSettings.enabled = false;
+        this.scheduleNotificationCheck();
+      } else {
         this.clearNotificationCheck();
-      } finally {
-        this.notificationSettings.isChecking = false;
       }
+      this.saveNotificationSettings();
     },
 
     scheduleNotificationCheck() {
-      this.clearNotificationCheck(); // Ensure no multiple timers
       this.notificationTimer = setInterval(() => {
         this.checkUpcomingTasks();
       }, 15 * 60 * 1000);
@@ -334,33 +310,20 @@ async function initializeApp() {
     loadNotificationSettings() {
       const stored = localStorage.getItem('minimal-calendar-notifications');
       if (stored) {
-        const storedSettings = JSON.parse(stored);
-        this.notificationSettings.enabled = storedSettings.enabled || false;
+        this.notificationSettings = { ...this.notificationSettings, ...JSON.parse(stored) };
       }
       
-      // Always check current live permission status on load
       if ('Notification' in window) {
         this.notificationSettings.permission = Notification.permission;
-      } else {
-        this.notificationSettings.permission = 'denied';
       }
       
-      // If permission is already denied, ensure the toggle is off.
-      if (this.notificationSettings.permission === 'denied') {
-        this.notificationSettings.enabled = false;
-      }
-      
-      // Auto-enable if permission is already granted and was previously enabled
       if (this.notificationSettings.enabled && this.notificationSettings.permission === 'granted') {
         this.scheduleNotificationCheck();
       }
     },
 
     saveNotificationSettings() {
-      // Only save the enabled state, not permission (always check live)
-      localStorage.setItem('minimal-calendar-notifications', JSON.stringify({
-        enabled: this.notificationSettings.enabled
-      }));
+      localStorage.setItem('minimal-calendar-notifications', JSON.stringify(this.notificationSettings));
     },
 
     // Export/Import functionality
