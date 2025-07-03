@@ -1,0 +1,165 @@
+<!-- Summary Popup Template -->
+<div id="summary-popup" v-if="summaryOpen" class="summary-popup">
+    <div class="summary-header">
+        <h3>Upcoming Events</h3>
+        <button @click="toggleSummary" class="close-summary-btn">&times;</button>
+    </div>
+    <div class="summary-content">
+        <div v-if="upcomingEvents.length === 0" class="no-events">
+            No upcoming events
+        </div>
+        <div v-for="event in upcomingEvents" class="summary-event">
+            <div class="summary-event-date">{{ formatSummaryDate(event.date) }}</div>
+            <div class="summary-event-title">
+                <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator material-symbols-light--rotate-left"></span>
+                <span v-if="event.link" class="link-indicator">🔗</span>
+                <span v-if="event.completed" class="completed-indicator material-symbols-light--check-box">✓</span>
+                {{ event.title }}
+            </div>
+            <div v-if="event.time" class="summary-event-time">{{ formatTime(event.time) }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Popup Template -->
+<div id="settings-popup" v-if="settingsModal.isOpen" class="settings-popup">
+    <div class="settings-header">
+        <h3>Settings</h3>
+        <button @click="closeSettingsModal" class="close-settings-btn">&times;</button>
+    </div>
+    <div class="settings-content">
+        <!-- Notifications Toggle -->
+        <div class="notification-toggle-section">
+            <label class="checkbox-label notification-toggle-label">
+                <input type="checkbox" v-model="notificationSettings.enabled" @change="toggleNotifications" :disabled="notificationSettings.isChecking">
+                <span class="checkmark"></span>
+                Enable task notifications
+            </label>
+            <div v-if="showNotificationWarning" class="notification-warning">
+                Notifications are blocked. Please enable them for this site in your browser settings.
+            </div>
+        </div>
+
+        <!-- Export/Import Section -->
+        <div class="export-import-section">
+            <h4>Data Management</h4>
+            <div class="export-import-buttons">
+                <button @click="exportTasks" class="export-btn">Export Tasks</button>
+                <button @click="importTasks" class="import-btn">Import Tasks</button>
+            </div>
+            <p class="export-import-note">Export your tasks as JSON or import tasks from a backup file. Import will overwrite existing tasks.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Points Popup Template -->
+<div id="points-popup" v-if="pointsModal.isOpen" class="points-popup">
+    <div class="points-header">
+        <h3>Points & Progress</h3>
+        <button @click="closePointsModal" class="close-points-btn">&times;</button>
+    </div>
+    <div class="points-content">
+        <div class="points-stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ pointsData.totalPoints }}</div>
+                <div class="stat-label">Total Points</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ getTodayPoints() }}</div>
+                <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ getWeeklyPoints() }}</div>
+                <div class="stat-label">This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ pointsData.streaks.current }}</div>
+                <div class="stat-label">Current Streak</div>
+            </div>
+        </div>
+
+        <div class="daily-progress">
+            <h4>Last 7 Days</h4>
+            <div class="progress-days">
+                <div v-for="day in getRecentDays()" :class="['progress-day', { 'today': day.isToday }]">
+                    <div class="progress-day-name">{{ day.dayName }}</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" :style="{ height: Math.max(4, (day.points / Math.max(1, Math.max(...getRecentDays().map(d => d.points)))) * 56) + 'px' }"></div>
+                    </div>
+                    <div class="progress-points">{{ day.points }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="achievements">
+            <h4>Achievements</h4>
+            
+            <!-- First Task Achievement -->
+            <div :class="['achievement-item', { 'completed': pointsData.tasksCreated >= 1 }]">
+                <div class="achievement-icon">🎯</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Getting Started</div>
+                    <div class="achievement-desc">Create your first task</div>
+                </div>
+                <div v-if="pointsData.tasksCreated >= 1" class="achievement-checkmark">✓</div>
+            </div>
+            
+            <!-- Task Master Achievement -->
+            <div :class="['achievement-item', { 'completed': pointsData.tasksCompleted >= 5 }]">
+                <div class="achievement-icon">⭐</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Task Master</div>
+                    <div class="achievement-desc">Complete 5 tasks</div>
+                </div>
+                <div v-if="pointsData.tasksCompleted >= 5" class="achievement-checkmark">✓</div>
+            </div>
+            
+            <!-- Task Champion Achievement -->
+            <div :class="['achievement-item', { 'completed': pointsData.tasksCompleted >= 50 }]">
+                <div class="achievement-icon">🏆</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Task Champion</div>
+                    <div class="achievement-desc">Complete 50 tasks</div>
+                </div>
+                <div v-if="pointsData.tasksCompleted >= 50" class="achievement-checkmark">✓</div>
+            </div>
+            
+            <!-- Century Club Achievement -->
+            <div :class="['achievement-item', { 'completed': pointsData.totalPoints >= 100 }]">
+                <div class="achievement-icon">💯</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Century Club</div>
+                    <div class="achievement-desc">Earn 100 points</div>
+                </div>
+                <div v-if="pointsData.totalPoints >= 100" class="achievement-checkmark">✓</div>
+            </div>
+            
+            <!-- Consistency King Achievement -->
+            <div :class="['achievement-item', { 'completed': pointsData.streaks.longest >= 7 }]">
+                <div class="achievement-icon">💎</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Consistency Is Key</div>
+                    <div class="achievement-desc">7-day streak</div>
+                </div>
+                <div v-if="pointsData.streaks.longest >= 7" class="achievement-checkmark">✓</div>
+            </div>
+            
+            <!-- Placeholder for no achievements yet -->
+            <div v-if="pointsData.tasksCreated === 0" class="achievement-item incomplete">
+                <div class="achievement-icon">🎯</div>
+                <div class="achievement-text">
+                    <div class="achievement-name">Start creating tasks to unlock achievements!</div>
+                    <div class="achievement-desc">Your journey begins here</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Crumb Indicator Template -->
+<div id="crumb-indicator" v-if="crumbVisible" class="crumb-indicator">
+    <button @click="closeCrumb" class="crumb-close-btn">&times;</button>
+    <div class="crumb-content">
+        <span class="crumb-text">Events and tasks are saved locally on this device</span>
+    </div>
+</div>

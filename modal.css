@@ -191,6 +191,28 @@
     font-style: italic;
 }
 
+.notification-toggle-section {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--lines-color);
+    margin-bottom: 0.75rem;
+}
+
+.notification-toggle-label {
+    font-size: 0.9rem !important;
+    color: var(--text-color) !important;
+    font-weight: 500 !important;
+}
+
+.notification-warning {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #ff4a0020;
+    border: 1px solid #ff4a0040;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #ff4a00;
+}
+
 /* Delete Confirmation Popup */
 .delete-confirmation-popup {
     position: absolute;
@@ -260,7 +282,7 @@
 .summary-button {
     position: fixed;
     bottom: 1.5rem;
-    right: 1.5rem;
+    right: 6.5rem;
     width: 30px;
     height: 30px;
     border-radius: 8px;
@@ -287,7 +309,7 @@
 .summary-popup {
     position: fixed;
     bottom: 6rem;
-    right: 1.5rem;
+    right: 6.5rem;
     width: 320px;
     max-height: 400px;
     background-color: var(--bg-color);
@@ -568,7 +590,7 @@ body.iframe-open #event-modal .modal-content {
     
     .summary-button {
         bottom: 1rem;
-        right: 1rem;
+        right: 7rem;
     }
 }
 
@@ -583,7 +605,7 @@ body.iframe-open #event-modal .modal-content {
     
     .summary-button {
         bottom: 1rem;
-        right: 1rem;
+        right: 7rem;
     }
     
     .points-button {
