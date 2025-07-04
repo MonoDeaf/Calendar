@@ -120,9 +120,9 @@ html {
     justify-content: center;
     gap: 0.75rem;
     padding: 0.875rem 1.5rem;
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--block-color);
+    color: var(--text-color);
+    border: 1px solid var(--lines-color);
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 500;
@@ -132,10 +132,10 @@ html {
 }
 
 .google-signin-btn:hover {
-    background-color: #f8f9fa;
-    border-color: #c6c6c6;
+    background-color: #222;
+    border-color: #555;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .login-error {
