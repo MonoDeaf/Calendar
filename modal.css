@@ -417,67 +417,6 @@
     color: #999;
 }
 
-/* Crumb Indicator */
-.crumb-indicator {
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    background-color: var(--bg-color);
-    border: 1px solid var(--lines-color);
-    border-radius: 8px;
-    padding: 0.75rem;
-    max-width: 250px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 998;
-    animation: crumbSlideIn 0.3s ease-out;
-}
-
-@keyframes crumbSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0) scale(1);
-    }
-}
-
-.crumb-close-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1rem;
-    cursor: pointer;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s;
-    opacity: 0.6;
-}
-
-.crumb-close-btn:hover {
-    opacity: 1;
-}
-
-.crumb-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding-right: 2rem;
-}
-
-.crumb-text {
-    font-size: 12px;
-    color: #b5b5b5;
-    line-height: 1.3;
-}
-
 /* Iframe Modal */
 .iframe-modal {
     position: fixed;
@@ -591,25 +530,5 @@ body.iframe-open #event-modal .modal-content {
     .summary-button {
         bottom: 1rem;
         right: 7rem;
-    }
-}
-
-/* Responsive adjustments for crumb */
-@media (max-width: 768px) {
-    .crumb-indicator {
-        right: 1rem;
-        bottom: 8rem;
-        left: 1rem;
-        max-width: none;
-    }
-    
-    .summary-button {
-        bottom: 1rem;
-        right: 7rem;
-    }
-    
-    .points-button {
-        bottom: 1rem;
-        right: 5.5rem;
     }
 }

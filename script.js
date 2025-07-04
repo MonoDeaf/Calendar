@@ -6,6 +6,17 @@ import { ModalManager } from './modules/modal-manager.js';
 import { CalendarUtils } from './modules/calendar-utils.js';
 import { PointsManager } from './modules/points-manager.js';
 import { TemplateLoader } from './modules/template-loader.js';
+import { AuthManager } from './modules/auth-manager.js';
+
+// Initialize Firebase and authentication first
+await AuthManager.init();
+
+// Set up global reference to AuthManager
+window.authManager = AuthManager;
+
+// Store app instance globally
+let appInstance = null;
+let appReactiveObject = null;
 
 // Initialize templates before creating the app
 async function initializeApp() {
@@ -13,31 +24,23 @@ async function initializeApp() {
   await TemplateLoader.loadAllTemplates();
   
   // Create the app instance
-  const app = createApp({
+  const reactiveObject = {
     ...EventManager,
     ...ModalManager,
     ...CalendarUtils,
     ...PointsManager,
+    ...AuthManager,
 
     // Core calendar state
     STORAGE_KEY: 'minimal-calendar-events',
     currentDate: new Date(),
     weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    events: (() => {
-      const storedEvents = localStorage.getItem('minimal-calendar-events');
-      return storedEvents ? JSON.parse(storedEvents) : {};
-    })(),
     
     // UI state
     summaryOpen: false,
     settingsModal: {
       isOpen: false
     },
-    crumbVisible: (() => {
-      // Reset the localStorage to make crumb appear again
-      localStorage.removeItem('crumb-dismissed');
-      return true;
-    })(),
     confetti,
 
     // Notification settings
@@ -141,11 +144,6 @@ async function initializeApp() {
     // Summary and UI methods
     toggleSummary() {
       this.summaryOpen = !this.summaryOpen;
-    },
-
-    closeCrumb() {
-      this.crumbVisible = false;
-      localStorage.setItem('crumb-dismissed', 'true');
     },
 
     // Override completeTask to include confetti and points
@@ -400,23 +398,75 @@ async function initializeApp() {
       input.click();
     },
 
+    async initializeUserData() {
+      if (this.user) {
+        // Wait for user data to load from Firebase
+        await this.loadUserData();
+        
+        // Force reactivity updates
+        this.currentDate = new Date(this.currentDate);
+        this.$nextTick(() => {
+          // Ensure reactive updates for points data
+          this.pointsData = { ...this.pointsData };
+          this.pointsData.dailyPoints = { ...this.pointsData.dailyPoints };
+        });
+      }
+    },
+
     mounted() {
-      this.loadEvents();
-      this.loadPointsData();
       this.loadNotificationSettings();
-      this.$nextTick(() => {
-        this.pointsData = { ...this.pointsData };
-        this.pointsData.dailyPoints = { ...this.pointsData.dailyPoints };
-      });
+      this.initializeUserData();
     }
-  });
+  };
+
+  const app = createApp(reactiveObject);
+  
+  // Store reference to reactive object for external access
+  appReactiveObject = reactiveObject;
 
   // Inject templates into the DOM before mounting
   TemplateLoader.injectTemplatesIntoContainer('app');
   
   // Mount the app
   app.mount('#app');
+  
+  // Return the app instance for later use
+  return app;
 }
 
-// Initialize the application
-initializeApp().catch(console.error);
+// Wait for authentication state to be determined
+AuthManager.onAuthStateChanged(async (user) => {
+  // Always show the calendar app
+  document.getElementById('app').style.display = 'flex';
+  
+  if (user) {
+    // User is signed in, hide the login overlay
+    document.getElementById('login-page').style.display = 'none';
+    
+    // Initialize the app if not already done
+    if (!window.appInitialized) {
+      appInstance = await initializeApp();
+      window.appInitialized = true;
+    }
+    
+    // Initialize user data in the app
+    if (appReactiveObject) {
+      await appReactiveObject.initializeUserData();
+    }
+  } else {
+    // User is signed out, show the login overlay
+    document.getElementById('login-page').style.display = 'flex';
+  }
+});
+
+// Set up Google Sign-In button
+document.getElementById('google-sign-in').addEventListener('click', async () => {
+  try {
+    await AuthManager.signInWithGoogle();
+  } catch (error) {
+    console.error('Sign-in failed:', error);
+    const errorDiv = document.getElementById('login-error');
+    errorDiv.textContent = 'Sign-in failed. Please try again.';
+    errorDiv.style.display = 'block';
+  }
+});

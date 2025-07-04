@@ -1,16 +1,24 @@
 // Points system management
 export const PointsManager = {
   POINTS_STORAGE_KEY: 'minimal-calendar-points',
-  pointsData: {
-    totalPoints: 0,
-    dailyPoints: {},
-    streaks: {
-      current: 0,
-      longest: 0
-    },
-    lastActiveDate: null,
-    tasksCreated: 0,
-    tasksCompleted: 0
+  
+  get pointsData() {
+    // Get points data from AuthManager instead of local storage
+    return window.authManager?.pointsData || {
+      totalPoints: 0,
+      dailyPoints: {},
+      streaks: { current: 0, longest: 0 },
+      lastActiveDate: null,
+      tasksCreated: 0,
+      tasksCompleted: 0
+    };
+  },
+
+  set pointsData(value) {
+    // Set points data through AuthManager
+    if (window.authManager) {
+      window.authManager.pointsData = value;
+    }
   },
 
   pointsModal: {
@@ -23,27 +31,15 @@ export const PointsManager = {
   },
 
   loadPointsData() {
-    const stored = localStorage.getItem(this.POINTS_STORAGE_KEY);
-    if (stored) {
-      const loadedData = JSON.parse(stored);
-      // Properly merge the loaded data with default structure
-      this.pointsData = {
-        totalPoints: loadedData.totalPoints || 0,
-        dailyPoints: loadedData.dailyPoints || {},
-        streaks: {
-          current: loadedData.streaks?.current || 0,
-          longest: loadedData.streaks?.longest || 0
-        },
-        lastActiveDate: loadedData.lastActiveDate || null,
-        tasksCreated: loadedData.tasksCreated || 0,
-        tasksCompleted: loadedData.tasksCompleted || 0
-      };
-    }
-    this.updateDailyStreak();
+    // Points data is loaded via Firebase in AuthManager
+    // Keep for compatibility
   },
 
   savePointsData() {
-    localStorage.setItem(this.POINTS_STORAGE_KEY, JSON.stringify(this.pointsData));
+    // Save points data through AuthManager to Firebase
+    if (window.authManager) {
+      window.authManager.savePointsData();
+    }
   },
 
   getTodayString() {
@@ -130,9 +126,6 @@ export const PointsManager = {
   },
 
   getRecentDays() {
-    // Load persisted dailyPoints so that each of the last 7 days retains its saved value
-    const stored = localStorage.getItem(this.POINTS_STORAGE_KEY);
-    const persisted = stored ? (JSON.parse(stored).dailyPoints || {}) : this.pointsData.dailyPoints;
     const days = [];
     const today = new Date();
     
@@ -140,7 +133,7 @@ export const PointsManager = {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateString = d.toISOString().slice(0, 10);
-      const points = persisted[dateString] ?? 0;
+      const points = this.pointsData.dailyPoints[dateString] || 0;
       
       days.push({
         date: dateString,

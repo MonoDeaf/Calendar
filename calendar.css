@@ -183,7 +183,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-top: 2px;
+    margin-top: 6px; /* increased spacing between title and description */
+    padding-left: 4px; /* added left padding to description */
 }
 
 .event-time {

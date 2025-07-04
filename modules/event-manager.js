@@ -1,7 +1,6 @@
 // Event management functionality
 export const EventManager = {
   STORAGE_KEY: 'minimal-calendar-events',
-  events: {},
   modal: {
     isOpen: false,
     date: null,
@@ -27,13 +26,28 @@ export const EventManager = {
     isOpen: false
   },
 
+  get events() {
+    // Get events from AuthManager instead of local storage
+    return window.authManager?.events || {};
+  },
+
+  set events(value) {
+    // Set events through AuthManager
+    if (window.authManager) {
+      window.authManager.events = value;
+    }
+  },
+
   loadEvents() {
-    const storedEvents = localStorage.getItem(this.STORAGE_KEY);
-    this.events = storedEvents ? JSON.parse(storedEvents) : {};
+    // Events are loaded via Firebase in AuthManager
+    // Keep for compatibility
   },
 
   saveEvents() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.events));
+    // Save events through AuthManager to Firebase
+    if (window.authManager) {
+      window.authManager.saveEvents();
+    }
   },
 
   getEventsForDate(dateStr) {
@@ -195,3 +209,10 @@ export const EventManager = {
     this.modal.isOpen = false;
   }
 };
+
+// Set up reference to AuthManager for accessing events
+window.addEventListener('load', () => {
+  if (window.authManager) {
+    window.authManager = window.authManager;
+  }
+});
