@@ -1,6 +1,7 @@
 <!-- Event Modal Template -->
 <div id="event-modal" v-if="modal.isOpen">
     <div class="modal-content">
+        <button v-if="modal.isViewing" @click="closeModal" class="modal-close-btn">&times;</button>
         <h3 id="modal-title">{{ modal.isViewing ? 'View Event' : (modal.isEditing ? 'Edit Event' : 'Add Event') }}</h3>
         <p id="modal-date-display">{{ new Date(modal.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>
         
@@ -152,7 +153,8 @@
                 </div>
             </div>
             <div class="right-buttons">
-                <button @click="closeModal" id="cancel-event-btn">{{ modal.isViewing ? 'Close' : 'Cancel' }}</button>
+                <button @click="closeModal" v-if="!modal.isViewing" id="cancel-event-btn">Cancel</button>
+                <button @click="editEvent" v-if="modal.isViewing" id="edit-event-btn">Edit</button>
                 <button @click="completeTask" v-if="modal.isViewing && !modal.completed" id="complete-task-btn">Mark Complete</button>
                 <button @click="saveEvent" v-if="!modal.isViewing" id="save-event-btn">Save</button>
             </div>
@@ -164,6 +166,6 @@
 <div id="iframe-modal" v-if="iframeModal.isOpen" class="iframe-modal">
     <div class="iframe-modal-content">
         <button @click="closeIframeModal" class="iframe-close-btn">&times;</button>
-        <iframe :src="iframeModal.url" class="iframe-content" frameborder="0"></iframe>
+        <iframe :src="iframeModal.url" class="iframe-content" frameborder="0" allow="camera; microphone; geolocation; payment; encrypted-media; clipboard-read; clipboard-write" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
     </div>
 </div>

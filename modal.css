@@ -39,6 +39,7 @@
     flex-direction: column;
     gap: 2rem;
     animation: modalSlideIn 0.2s ease-out;
+    position: relative;
 }
 
 @keyframes modalSlideIn {
@@ -161,6 +162,18 @@
 
 #cancel-event-btn:hover {
     background-color: #333;
+}
+
+#edit-event-btn {
+    background-color: #090909;
+    border: 1px solid #333;
+    color: var(--text-color);
+}
+
+#edit-event-btn:hover {
+    background-color: #111111;
+    border-color: #333;
+    color: var(--text-color);
 }
 
 #complete-task-btn {
@@ -309,7 +322,7 @@
 .summary-popup {
     position: fixed;
     bottom: 6rem;
-    right: 6.5rem;
+    right: 1.5rem;
     width: 320px;
     max-height: 400px;
     background-color: var(--bg-color);
@@ -461,7 +474,7 @@
     }
 }
 
-.iframe-close-btn {
+.modal-close-btn {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
@@ -481,7 +494,7 @@
     z-index: 1002;
 }
 
-.iframe-close-btn:hover {
+.modal-close-btn:hover {
     background-color: #222;
 }
 
@@ -527,8 +540,8 @@ body.iframe-open #event-modal .modal-content {
         bottom: 5rem;
     }
     
-    .summary-button {
+    .button-container {
         bottom: 1rem;
-        right: 7rem;
+        right: 1rem;
     }
 }

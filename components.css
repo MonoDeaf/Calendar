@@ -204,7 +204,7 @@ textarea {
 
 .recurring-badge {
     font-size: 0.9rem;
-    opacity: 0.8;
+    color: #67ff3d;
 }
 
 .event-link {
@@ -229,7 +229,7 @@ textarea {
     display: inline-block;
     width: 16px;
     height: 16px;
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m10.95 11.887l-1.071-1.072q-.146-.14-.354-.14t-.354.146t-.146.354t.146.354l1.189 1.194q.242.243.578.243t.577-.243l3.314-3.32q.146-.145.155-.343t-.155-.364q-.146-.146-.354-.146t-.354.146zM12 16.923l-3.738 1.608q-.808.348-1.535-.134Q6 17.916 6 17.052V5.616q0-.691.463-1.153T7.616 4h8.769q.69 0 1.153.463T20 5.616v11.436q0 .864-.727 1.345q-.727.482-1.535.134T12 12t1.413.588T14 12t-.587 1.413T12 14m-6.384 6q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h12.769q.69 0 1.153.463T20 5.616v12.769q0 .69-.462 1.153T18.384 20zm0-1h1.956l.369-2.708q.756-.2 1.36-.549q.606-.349 1.232-.956l2.495 1.063l.994-1.7l-2.189-1.644q.125-.427.166-.786q.048-.358.01-.72q.005-.416-.295-.716t-.715-.287q-.415.012-.715.312'/%3E%3C/svg%3E");
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m10.6 13.8l-2.15-2.15q-.275-.275-.7-.275t-.7.275t-.275.7t.275.7L9.9 15.9q.3.3.7.3t.7-.3l5.65-5.65q.275-.275.275-.7t-.275-.7t-.7-.275t-.7.275zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.35 0 5.675-2.325T20 12t-2.325-5.675T12 4T6.325 6.325T4 12t2.325 5.675T12 20m0-8'/%3E%3C/svg%3E");
     background-color: currentColor;
     -webkit-mask-image: var(--svg);
     mask-image: var(--svg);
@@ -257,7 +257,7 @@ textarea {
     display: inline-block;
     width: 16px;
     height: 16px;
-    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11.577 16.23h.846l.185-1.23q.569-.14.354-.14t.354.146t.146.354t-.146.354l-1.189 1.194q-.242.243-.578.243t-.577-.243l-3.314-3.32q-.146-.145-.155-.343t.155-.364q.146-.146.354-.146t.354.146zM12 16.923l-3.738 1.608q-.808.348-1.535-.134Q6 17.916 6 17.052V5.616q0-.691.463-1.153T7.616 4h8.769q.69 0 1.153.463T20 5.616v11.436q0 .864-.727 1.345q-.727.482-1.535.134T12 12t1.413.588T14 12t-.587 1.413T12 14m-6.384 6q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h12.769q.69 0 1.153.463T20 5.616v12.769q0 .69-.462 1.153T18.384 20zm0-1h1.956l.369-2.708q.756-.2 1.36-.549q.606-.349 1.232-.956l2.495 1.063l.994-1.7l-2.189-1.644q.125-.427.166-.786q.048-.358.01-.72q.005-.416-.295-.716t-.715-.287q-.415.012-.715.312'/%3E%3C/svg%3E");
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m6.85 19l.85.85q.3.3.288.7t-.288.7q-.3.3-.712.313t-.713-.288L3.7 18.7q-.15-.15-.213-.325T3.426 18t.063-.375t.212-.325l2.575-2.575q.3-.3.713-.287t.712.312q.275.3.288.7t-.288.7l-.85.85H17v-3q0-.425.288-.712T18 13t.713.288T19 14v3q0 .825-.587 1.413T17 19zm10.3-12H7v3q0 .425-.288.713T6 11t-.712-.288T5 10V7q0-.825.588-1.412T7 5h10.15l-.85-.85q-.3-.3-.288-.7t.288-.7q.3-.3.712-.312t.713.287L20.3 5.3q.15.15.213.325t.062.375t-.062.375t-.213.325l-2.575 2.575q-.3.3-.712.288T16.3 9.25q-.275-.3-.288-.7t.288-.7z'/%3E%3C/svg%3E");
     background-color: currentColor;
     -webkit-mask-image: var(--svg);
     mask-image: var(--svg);
@@ -296,9 +296,9 @@ textarea {
 }
 
 .points-button {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 4rem;
+    position: relative;
+    bottom: 0;
+    right: 0;
     width: 30px;
     height: 30px;
     border-radius: 8px;
@@ -325,7 +325,7 @@ textarea {
 .points-popup {
     position: fixed;
     bottom: 6rem;
-    right: 4rem;
+    right: 1.5rem;
     width: 380px;
     max-height: 500px;
     background-color: var(--bg-color);
@@ -551,9 +551,9 @@ textarea {
 }
 
 .settings-button {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
+    position: relative;
+    bottom: 0;
+    right: 0;
     width: 30px;
     height: 30px;
     border-radius: 8px;
@@ -732,6 +732,33 @@ textarea {
     }
 }
 
+.summary-button {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: #090909;
+    border: 1px solid var(--lines-color);
+    color: var(--text-color);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.summary-button:hover {
+    background-color: #111;
+    border-color: #555;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
 .export-import-section {
     padding: 0.75rem;
     border-top: 1px solid var(--lines-color);
@@ -776,6 +803,38 @@ textarea {
     margin: 0;
 }
 
+/* New button container */
+.button-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #333;
+    border-radius: 12px;
+    z-index: 998;
+}
+
+/* Responsive adjustments for summary */
+@media (max-width: 768px) {
+    .summary-popup {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        bottom: 5rem;
+    }
+    
+    .button-container {
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
 /* Responsive adjustments for points */
 @media (max-width: 768px) {
     .points-popup {
@@ -804,17 +863,15 @@ textarea {
         bottom: 5rem;
     }
     
-    .settings-button {
+    .button-container {
         bottom: 1rem;
         right: 1rem;
     }
     
-    .points-button {
-        bottom: 1rem;
-        right: 4rem;
-    }
-    
-    .summary-button {
-        right: 7rem;
+    .points-popup {
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        bottom: 5rem;
     }
 }

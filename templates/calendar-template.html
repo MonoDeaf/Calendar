@@ -9,12 +9,11 @@
         <div class="events-container">
             <div v-for="(event, index) in getEventsForDate(day.date)" :class="['event-block', { 'completed': event.completed }]" :title="event.title + (event.description ? ' - ' + event.description : '')" @click.stop="viewEvent(day.date, index)">
                 <div class="event-title">
-                    <span v-if="event.recurring && event.recurring.enabled" class="recurring-indicator material-symbols-light--rotate-left"></span>
-                    <span v-if="event.link" class="link-indicator">🔗</span>
+                    <span v-if="event.recurring && event.recurring.enabled && !event.completed" class="recurring-indicator material-symbols-light--rotate-left"></span>
+                    <span v-if="event.link && !event.completed" class="link-indicator">🔗</span>
                     <span v-if="event.completed" class="completed-indicator material-symbols-light--check-box">✓</span>
-                    {{ event.title }}
+                    <span class="event-title-text">{{ event.title }}</span>
                 </div>
-                <div v-if="event.description" class="event-description">{{ event.description }}</div>
                 <div v-if="event.time" class="event-time">{{ formatTime(event.time) }}</div>
             </div>
         </div>

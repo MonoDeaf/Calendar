@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -57,20 +58,22 @@
         </div>
 
         <!-- Summary Button and Popup -->
-        <button id="summary-btn" @click="toggleSummary" class="summary-button" aria-label="View upcoming events">
-            <span class="material-symbols-light--date-range-outline"></span>
-        </button>
+        <div class="button-container">
+            <button id="summary-btn" @click="toggleSummary" class="summary-button" aria-label="View upcoming events">
+                <span class="material-symbols-light--date-range-outline"></span>
+            </button>
 
-        <!-- Points Button -->
-        <button id="points-btn" @click="togglePoints" class="points-button" aria-label="View points and progress">
-            <span class="material-symbols-light--star"></span>
-            <div v-if="pointsIndicator.visible" class="points-indicator-dot"></div>
-        </button>
+            <!-- Points Button -->
+            <button id="points-btn" @click="togglePoints" class="points-button" aria-label="View points and progress">
+                <span class="material-symbols-light--star"></span>
+                <div v-if="pointsIndicator.visible" class="points-indicator-dot"></div>
+            </button>
 
-        <!-- Settings Button -->
-        <button id="settings-btn" @click="toggleSettings" class="settings-button" aria-label="Open settings">
-            <img :src="user?.photoURL || 'https://via.placeholder.com/30'" :alt="user?.displayName || 'User'" class="settings-avatar">
-        </button>
+            <!-- Settings Button -->
+            <button id="settings-btn" @click="toggleSettings" class="settings-button" aria-label="Open settings">
+                <img :src="user?.photoURL || 'https://via.placeholder.com/30'" :alt="user?.displayName || 'User'" class="settings-avatar">
+            </button>
+        </div>
     </div>
 
     <script type="module" src="script.js"></script>

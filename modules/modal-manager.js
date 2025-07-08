@@ -87,10 +87,12 @@ export const ModalManager = {
         const popupHeight = 720;
         const left = (screen.width - popupWidth) / 2;
         const top = (screen.height - popupHeight) / 2;
-        const popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,location=no,directories=no,status=no,menubar=no`;
+        // Minimal restrictions to allow session sharing
+        const popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no`;
         window.open(event.link, '_blank', popupFeatures);
       } else {
-        window.open(event.link, '_blank', 'noopener,noreferrer');
+        // Open in new tab with full browser context
+        window.open(event.link, '_blank');
       }
     }
   },
@@ -100,6 +102,11 @@ export const ModalManager = {
     this.iframeModal.url = '';
     // Remove class from body to reset positioning
     document.body.classList.remove('iframe-open');
+  },
+
+  editEvent() {
+    this.modal.isViewing = false;
+    this.modal.isEditing = true;
   },
 
   completeTask() {
